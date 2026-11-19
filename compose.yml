@@ -35,7 +35,7 @@ services:
         condition: service_healthy
     volumes:
       - ./otel/otel-config.yml:/etc/otelcol/config.yaml:ro
-      - ./var/www/bsmsc/storage/logs:/logs
+      - /var/www/bsmsc/storage/logs:/logs
       - ./otel-storage-volume:/var/lib/otelcol/storage
     ports:
       - "4317:4317"
