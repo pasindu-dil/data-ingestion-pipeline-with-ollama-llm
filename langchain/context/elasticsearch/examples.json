@@ -1,0 +1,6 @@
+[
+  {
+    "question": "Show error count per hour for the last 24 hours",
+    "sql": "FROM logs-*\n| WHERE log.level == \"error\" AND @timestamp > NOW() - 24 hours\n| STATS errors = COUNT(*) BY hour = DATE_TRUNC(1 hour, @timestamp)\n| SORT hour"
+  }
+]

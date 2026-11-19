@@ -1,0 +1,55 @@
+[project]
+name = "text2sql"
+version = "2.0.0"
+description = "Offline natural-language to query service (ClickHouse + Elasticsearch)"
+requires-python = ">=3.11"
+
+# ------------------------------------------------------------------ ruff
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["app", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "E", "W",   # pycodestyle
+    "F",        # pyflakes
+    "I",        # isort (import order)
+    "N",        # pep8-naming
+    "UP",       # pyupgrade (modern syntax)
+    "B",        # bugbear (likely bugs)
+    "C4",       # comprehensions
+    "SIM",      # simplifications
+    "RET",      # return consistency
+    "PT",       # pytest style
+]
+ignore = [
+    "B008",     # FastAPI's Depends() in argument defaults is the intended pattern
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["PT018"]  # compound asserts are fine in tests
+
+[tool.ruff.format]
+quote-style = "double"
+
+# ------------------------------------------------------------------ mypy
+[tool.mypy]
+python_version = "3.11"
+packages = ["app"]
+strict = true
+warn_unreachable = true
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+module = ["clickhouse_connect.*", "sqlglot.*", "langchain_ollama.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["tests.*"]
+disallow_untyped_defs = false
+
+# ------------------------------------------------------------------ pytest
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

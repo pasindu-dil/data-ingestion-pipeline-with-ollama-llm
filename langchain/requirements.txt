@@ -1,0 +1,8 @@
+fastapi
+uvicorn[standard]
+pydantic-settings
+clickhouse-connect
+sqlglot
+langchain-core
+langchain-ollama
+elasticsearch>=8.14

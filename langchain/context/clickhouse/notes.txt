@@ -1,0 +1,53 @@
+# Hints for the ClickHouse SQL generator. REPLACE the text below with facts about YOUR tables.
+# Everything in this file is sent to the LLM on every question, so keep it short and factual.
+
+Database: otel (always use fully qualified names, e.g. otel.request_logs).
+
+Tables
+- event_logs, structured_logs: event logs. Each row is one consent request record.
+  Fields include: date, server_ref, event, app_id, msisdn, channel, language, purpose_id,
+  param_ids, request_status, status_code, consent_status, user_input.
+- request_logs, structured_request_logs: HTTP request logs written by a Laravel web application.
+  Each row is one request with: time, log level, HTTP method, URL and a JSON payload.
+- otel_logs: logs collected by the OpenTelemetry collector.
+- Do NOT query event_logs_bkp (backup copy), mv_structured_logs or mv_structured_request_logs
+  (materialized views that fill the structured_* tables).
+- Prefer structured_logs and structured_request_logs when the question can be answered from
+  their columns. Use event_logs / request_logs only when the structured tables lack the data.
+
+Request log details
+- The log level looks like local.INFO or local.ERROR (environment.LEVEL). To find errors use
+  level LIKE '%ERROR'.
+- The URL is a full address such as http://127.0.0.1:8107/transactions/datatable. For the
+  endpoint use path(url), e.g. '/campaign-history/datatable'.
+- The JSON payload holds these keys:
+    meta.client-ip                  caller IP address
+    meta.headers                    request headers (user-agent, content-type)
+    meta.data.inputs.requestId      unique id of the request
+    meta.data.inputs.auth_user_id   id of the logged-in user (a number)
+    meta.data.inputs.start_date     start of the requested date range (text, 'YYYY-MM-DD HH:MM')
+    meta.data.inputs.end_date       end of the requested date range
+    meta.data.inputs.draw / start / length / order / columns / search   DataTables paging options
+- Read payload values with JSONExtractString / JSONExtractInt, e.g.
+  JSONExtractString(payload, 'meta', 'data', 'inputs', 'requestId').
+  Only do this when the column holding the JSON really is a String column.
+- Typical endpoints: /transactions/datatable, /campaign-history/datatable.
+
+Event log meanings
+- The main log table is otel.event_logs. One row = one log line.
+- Column `Timestamp` is DateTime64 in UTC. Use it for every time filter.
+- Column `LogLevel` holds: DEBUG, INFO, WARN, ERROR. An "error" always means level = 'ERROR'.
+- Column `service` is the application name (e.g. 'sms-firewall', 'ussd-gateway').
+- Column `Module` is the application class  name (e.g. 'login', 'users')
+- Column `Action` is the application function name (e.g 'login', 'update-password')
+- Column `Status` is the status of the event like 'success'  or 'failed'
+- Column `attributes` is Map(String, String). Read values as attributes['key'].
+- "Success" means level = 'INFO' AND attributes['status'] = 'success'.
+- "Today" / "last hour" / "last 24 hours" are relative to now(); use now() - INTERVAL ...
+- Never use SELECT *; select only the columns needed to answer the question.
+
+General rules
+- "Today", "last hour", "last 24 hours" are relative to now(). Use now() - INTERVAL ... or today().
+- Timestamps are written like 2025-12-08 09:58:24.
+- msisdn is a phone number (personal data). Do not select it unless the question asks for it.
+- Never use SELECT *. Select only the columns needed. Add ORDER BY and LIMIT for "latest" or "top" questions.

@@ -1,0 +1,73 @@
+services:
+  clickhouse:
+    image: clickhouse/clickhouse-server
+    environment:
+      CLICKHOUSE_DB: otel
+      CLICKHOUSE_USER: otel
+      CLICKHOUSE_PASSWORD: otelpass
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
+    ports:
+      - "8123:8123"   # HTTP
+      - "9000:9000"   # native
+    volumes:
+      - clickhouse-data:/var/lib/clickhouse
+    ulimits:
+      nofile: { soft: 262144, hard: 262144 }
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8123/ping"]
+      interval: 5s
+      retries: 10
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest   # pin a version in production
+    command: ["--config=/etc/otelcol/config.yaml"]
+    user: "0:0"
+    depends_on:
+      clickhouse:
+        condition: service_healthy
+    volumes:
+      - ./otel/otel-config.yml:/etc/otelcol/config.yaml:ro
+      - ./logs:/logs
+      # - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - ./otel-storage:/var/lib/otelcol/storage
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+
+  ollama:
+    image: ollama/ollama:latest
+    volumes:
+      - ollama:/root/.ollama
+    ports: ["11434:11434"]
+    # GPU (optional):
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices: [{driver: nvidia, count: all, capabilities: [gpu]}]
+
+  app:
+    build: ./langchain
+    image: text2sql-app
+    depends_on: [clickhouse, ollama]
+    ports: ["8000:8000"]
+    volumes:
+      - ./langchain:/app
+    environment:
+      CH_HOST: clickhouse
+      CH_USER: otel
+      CH_PASSWORD: otelpass
+      CH_DB: otel
+      OLLAMA_URL: http://ollama:11434
+      MODEL: qwen2.5-coder:7b
+      MODELS: qwen2.5-coder:7b,qwen2.5-coder:14b,sqlcoder:7b
+    stdin_open: true
+    tty: true
+
+volumes:
+  clickhouse-data:
+  ollama:
+  # otel-storage:
+
+networks:
+  default:
+    driver: bridge
