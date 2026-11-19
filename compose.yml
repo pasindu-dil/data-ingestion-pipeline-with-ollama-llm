@@ -18,6 +18,8 @@ services:
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:8123/ping"]
       interval: 5s
       retries: 10
+    networks:
+      - log-analyzer
 
   otel-collector:
     image: otel/opentelemetry-collector-contrib:latest
@@ -34,6 +36,8 @@ services:
     ports:
       - "4317:4317"
       - "4318:4318"
+    networks:
+      - log-analyzer
 
   ollama:
     image: ollama/ollama:latest
@@ -41,6 +45,8 @@ services:
     volumes:
       - ollama:/root/.ollama
     ports: ["11434:11434"]
+    networks:
+      - log-analyzer
     # GPU (optional):
     # deploy:
     #   resources:
@@ -48,7 +54,9 @@ services:
     #       devices: [{driver: nvidia, count: all, capabilities: [gpu]}]
 
   log-analyzer:
-    build: ./langchain
+    build: 
+      context: ./langchain
+      network: host
     image: log-analyzer-app
     container_name: log-analyzer
     depends_on: [clickhouse, ollama]
@@ -65,10 +73,13 @@ services:
       MODELS: qwen2.5-coder:7b,qwen2.5-coder:14b,sqlcoder:7b
     stdin_open: true
     tty: true
+    networks:
+      - log-analyzer
 
 volumes:
   ollama:
 
 networks:
-  default:
+  log-analyzer:
+    name: log-analyzer
     driver: bridge
