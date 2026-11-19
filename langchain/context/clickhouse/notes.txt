@@ -4,15 +4,15 @@
 Database: otel (always use fully qualified names, e.g. otel.request_logs).
 
 Tables
-- event_logs, structured_logs: event logs. Each row is one consent request record.
+- event_logs, structured_event_logs: event logs. Each row is one consent request record.
   Fields include: date, server_ref, event, app_id, msisdn, channel, language, purpose_id,
   param_ids, request_status, status_code, consent_status, user_input.
 - request_logs, structured_request_logs: HTTP request logs written by a Laravel web application.
   Each row is one request with: time, log level, HTTP method, URL and a JSON payload.
 - otel_logs: logs collected by the OpenTelemetry collector.
-- Do NOT query event_logs_bkp (backup copy), mv_structured_logs or mv_structured_request_logs
+- Do NOT query event_logs_bkp (backup copy), mv_structured_event_logs or mv_structured_request_logs
   (materialized views that fill the structured_* tables).
-- Prefer structured_logs and structured_request_logs when the question can be answered from
+- Prefer structured_event_logs and structured_request_logs when the question can be answered from
   their columns. Use event_logs / request_logs only when the structured tables lack the data.
 
 Request log details
@@ -49,10 +49,10 @@ Event log meanings
 Joining tables
 - Prefer one table. Join only when the question needs data from both event logs and request logs.
 - Join keys (the only allowed ones):
-    event_logs / structured_logs . TraceId  =  TraceId of the request log / structured_request_logs
+    event_logs / structured_event_logs . TraceId  =  TraceId of the request log / structured_request_logs
     (the request id / TraceId is JSONExtractString(payload, 'meta', 'data', 'inputs', 'requestId'))
 - Filter both sides by the same time range BEFORE joining, using subqueries.
-- Do not join event_logs with structured_logs, or request_logs with structured_request_logs.
+- Do not join event_logs with structured_event_logs, or request_logs with structured_request_logs.
   They hold the same data in two forms.
 - Never join on msisdn.
 
