@@ -5,7 +5,7 @@ extensions:
 receivers:
   file_log/events:
     include: [/logs/events/*.log] # Adjust folder path as needed
-    start_at: end
+    start_at: beginning
     storage: file_storage
     include_file_path: true
     operators:
@@ -17,7 +17,7 @@ receivers:
 
   file_log/requests:
     include: [/logs/requests/*.log]
-    start_at: end
+    start_at: beginning
     storage: file_storage
     include_file_path: true
     multiline:
