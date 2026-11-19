@@ -3,24 +3,9 @@ extensions:
     directory: /var/lib/otelcol/storage
 
 receivers:
-  # file_log:
-  #   include: [/logs/*/*.log]
-  #   start_at: beginning
-  #   storage: file_storage
-  #   include_file_path: true
-  #   operators:
-  #     - type: regex_parser
-  #       regex: '^(?P<timestamp>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}),(?P<log_level>[^,]+),(?P<trace_id>[^,]+),(?P<module>[^,]+),(?P<action>[^,]+),(?P<event>[^,]+),(?P<status>[^,]+),(?P<response_json>.*)$'
-  #       timestamp:
-  #         parse_from: attributes.timestamp
-  #         layout: '%Y-%m-%d %H:%M:%S'
-  #     - type: json_parser
-  #       parse_from: attributes.response_json
-  #       into: attributes.parsed_json
-
   file_log/events:
-    include: [/logs/event/*.log] # Adjust folder path as needed
-    start_at: beginning
+    include: [/logs/events/*.log] # Adjust folder path as needed
+    start_at: end
     storage: file_storage
     include_file_path: true
     operators:
@@ -30,10 +15,9 @@ receivers:
           parse_from: attributes.timestamp
           layout: '%Y-%m-%d %H:%M:%S'
 
-  # 2. New Request Logs
   file_log/requests:
-    include: [/logs/request/*.log]
-    start_at: beginning
+    include: [/logs/requests/*.log]
+    start_at: end
     storage: file_storage
     include_file_path: true
     multiline:
@@ -62,48 +46,26 @@ processors:
 exporters:
   debug:
     verbosity: normal
-  # clickhouse:
-  #   endpoint: tcp://clickhouse:9000?dial_timeout=10s
-  #   # or HTTP: http://clickhouse:8123?dial_timeout=10s
-  #   database: otel
-  #   username: otel
-  #   password: otelpass
-  #   logs_table_name: event_logs
-  #   create_schema: true          # auto-creates database/tables
-  #   ttl: 72h                     # retention
-  #   timeout: 10s
-  #   sending_queue:
-  #     queue_size: 100
-  #   retry_on_failure:
-  #     enabled: true
-  #     initial_interval: 5s
-  #     max_interval: 30s
-  #     max_elapsed_time: 300s
 
   clickhouse/events:
     endpoint: tcp://clickhouse:9000?dial_timeout=10s
-    database: otel
-    username: otel
-    password: otelpass
+    database: ${env:CH_DB}
+    username: ${env:CH_USER}
+    password: ${env:CH_PASSWORD}
     logs_table_name: event_logs
     create_schema: true
 
   clickhouse/requests:
     endpoint: tcp://clickhouse:9000?dial_timeout=10s
-    database: otel
-    username: otel
-    password: otelpass
+    database: ${env:CH_DB}
+    username: ${env:CH_USER}
+    password: ${env:CH_PASSWORD}
     logs_table_name: request_logs
     create_schema: false
 
 service:
   extensions: [file_storage]
   pipelines:
-    # logs:
-    #   receivers: [file_log]
-    #   processors: [batch, transform]
-    #   exporters: [debug, clickhouse]
-
     logs/events:
       receivers: [file_log/events]
       processors: [batch]

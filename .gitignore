@@ -3,3 +3,6 @@
 /langchain.bkp
 /app_bkp
 compose.bkp.yml
+/clickhouse-volume
+/otel-storage-volume
+.env
