@@ -46,6 +46,16 @@ Event log meanings
 - "Today" / "last hour" / "last 24 hours" are relative to now(); use now() - INTERVAL ...
 - Never use SELECT *; select only the columns needed to answer the question.
 
+Joining tables
+- Prefer one table. Join only when the question needs data from both event logs and request logs.
+- Join keys (the only allowed ones):
+    event_logs / structured_logs . TraceId  =  TraceId of the request log / structured_request_logs
+    (the request id / TraceId is JSONExtractString(payload, 'meta', 'data', 'inputs', 'requestId'))
+- Filter both sides by the same time range BEFORE joining, using subqueries.
+- Do not join event_logs with structured_logs, or request_logs with structured_request_logs.
+  They hold the same data in two forms.
+- Never join on msisdn.
+
 General rules
 - "Today", "last hour", "last 24 hours" are relative to now(). Use now() - INTERVAL ... or today().
 - Timestamps are written like 2025-12-08 09:58:24.
