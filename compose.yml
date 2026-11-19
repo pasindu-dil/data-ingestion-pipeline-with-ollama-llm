@@ -24,6 +24,10 @@ services:
   otel-collector:
     image: otel/opentelemetry-collector-contrib:latest
     container_name: otel-collector
+    environment:
+      CH_DB: ${CH_DB}
+      CH_USER: ${CH_USER}
+      CH_PASSWORD: ${CH_PASSWORD}
     command: ["--config=/etc/otelcol/config.yaml"]
     user: "0:0"
     depends_on:
