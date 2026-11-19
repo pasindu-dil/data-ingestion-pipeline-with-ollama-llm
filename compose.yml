@@ -57,6 +57,11 @@ services:
     build: 
       context: ./langchain
       network: host
+      args:
+        HTTP_PROXY: http://127.0.0.1:8118
+        HTTPS_PROXY: http://127.0.0.1:8118
+        http_proxy: http://127.0.0.1:8118
+        https_proxy: http://127.0.0.1:8118
     image: log-analyzer-app
     container_name: log-analyzer
     depends_on: [clickhouse, ollama]
