@@ -56,10 +56,7 @@ services:
     #   args:
     #     <<: *build-proxy
     image: ollama/ollama:latest
-    environment:
-      - HTTP_PROXY=${HTTP_PROXY}
-      - HTTPS_PROXY=${HTTPS_PROXY}
-      - NO_PROXY=localhost,127.0.0.1
+    extra_hosts: ["host.docker.internal:host-gateway"]
     container_name: ollama
     volumes:
       - ollama:/root/.ollama
