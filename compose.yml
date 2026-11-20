@@ -50,11 +50,16 @@ services:
       - log-analyzer
 
   ollama:
-    build:
-      context: ./ollama
-      network: host
-      args:
-        <<: *build-proxy
+    # build:
+    #   context: ./ollama
+    #   network: host
+    #   args:
+    #     <<: *build-proxy
+    image: ollama/ollama:latest
+    environment:
+      - HTTP_PROXY=${HTTP_PROXY}
+      - HTTPS_PROXY=${HTTPS_PROXY}
+      - NO_PROXY=localhost,127.0.0.1
     container_name: ollama
     volumes:
       - ollama:/root/.ollama
