@@ -46,7 +46,6 @@ services:
   ollama:
     image: ollama/ollama:latest
     container_name: ollama
-    network_mode: host
     volumes:
       - ollama:/root/.ollama
     ports: ["11434:11434"]
@@ -87,4 +86,4 @@ volumes:
 networks:
   log-analyzer:
     name: log-analyzer
-    driver: bridge
+    external: true
