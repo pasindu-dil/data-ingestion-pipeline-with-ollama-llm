@@ -2,6 +2,7 @@ services:
   privoxy:
     build:
       context: ./privoxy
+      network: host
     container_name: privoxy
     restart: unless-stopped
     expose:
