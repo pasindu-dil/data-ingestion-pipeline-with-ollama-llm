@@ -1,15 +1,18 @@
 FROM debian:bookworm-slim
 
-RUN echo 'Acquire::ForceIPv4 "true";' \
-    > /etc/apt/apt.conf.d/99force-ipv4
+# Use HTTP repositories initially to bootstrap CA certificates
+RUN sed -i 's|https://deb.debian.org|http://deb.debian.org|g' \
+    /etc/apt/sources.list.d/debian.sources
 
-RUN apt-get update --fix-missing && \
+RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-        privoxy \
         ca-certificates \
+        privoxy \
         curl && \
+    update-ca-certificates && \
     rm -rf /var/lib/apt/lists/*
 
+# Listen on all container interfaces
 RUN sed -i \
     's/^listen-address.*/listen-address  0.0.0.0:8118/' \
     /etc/privoxy/config
