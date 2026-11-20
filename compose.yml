@@ -42,7 +42,6 @@ services:
       - "4318:4318"
     networks:
       - log-analyzer
-      - host
 
   ollama:
     image: ollama/ollama:latest
