@@ -42,6 +42,7 @@ services:
       - "4318:4318"
     networks:
       - log-analyzer
+      - host
 
   ollama:
     image: ollama/ollama:latest
@@ -86,4 +87,4 @@ volumes:
 networks:
   log-analyzer:
     name: log-analyzer
-    external: true
+    external: bridge
