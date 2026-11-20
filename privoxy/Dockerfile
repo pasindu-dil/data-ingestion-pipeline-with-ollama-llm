@@ -1,5 +1,8 @@
 FROM debian:bookworm-slim
 
+RUN echo 'Acquire::ForceIPv4 "true";' \
+    > /etc/apt/apt.conf.d/99force-ipv4
+
 RUN apt-get update --fix-missing && \
     apt-get install -y --no-install-recommends \
         privoxy \
