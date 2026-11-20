@@ -87,4 +87,4 @@ volumes:
 networks:
   log-analyzer:
     name: log-analyzer
-    external: bridge
+    driver: bridge
