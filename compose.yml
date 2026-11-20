@@ -44,7 +44,9 @@ services:
       - log-analyzer
 
   ollama:
-    image: ollama/ollama:latest
+    build:
+      context: ./ollama
+      network: host
     container_name: ollama
     volumes:
       - ollama:/root/.ollama
