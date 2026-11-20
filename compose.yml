@@ -79,22 +79,22 @@ services:
     #     reservations:
     #       devices: [{driver: nvidia, count: all, capabilities: [gpu]}]
 
-    ollama:
-      image: ollama/ollama:latest
-      container_name: ollama
-      network_mode: host
-      environment:
-        OLLAMA_HOST: 127.0.0.1:11434
-        HTTP_PROXY: http://127.0.0.1:8118
-        HTTPS_PROXY: http://127.0.0.1:8118
-        http_proxy: http://127.0.0.1:8118
-        https_proxy: http://127.0.0.1:8118
-      volumes:
-        - ollama:/root/.ollama
-      ports:
-        - "11434:11434"
-      networks:
-        - log-analyzer
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    network_mode: host
+    environment:
+      OLLAMA_HOST: 127.0.0.1:11434
+      HTTP_PROXY: http://127.0.0.1:8118
+      HTTPS_PROXY: http://127.0.0.1:8118
+      http_proxy: http://127.0.0.1:8118
+      https_proxy: http://127.0.0.1:8118
+    volumes:
+      - ollama:/root/.ollama
+    ports:
+      - "11434:11434"
+    networks:
+      - log-analyzer
 
   log-analyzer:
     build: 
