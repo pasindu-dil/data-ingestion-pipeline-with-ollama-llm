@@ -1,10 +1,12 @@
 FROM debian:bookworm-slim
 
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends privoxy ca-certificates && \
+RUN apt-get update --fix-missing && \
+    apt-get install -y --no-install-recommends \
+        privoxy \
+        ca-certificates \
+        curl && \
     rm -rf /var/lib/apt/lists/*
 
-# Allow other containers to connect to Privoxy
 RUN sed -i \
     's/^listen-address.*/listen-address  0.0.0.0:8118/' \
     /etc/privoxy/config
