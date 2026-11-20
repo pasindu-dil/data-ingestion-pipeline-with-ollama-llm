@@ -58,6 +58,10 @@ services:
     image: ollama/ollama:latest
     extra_hosts: ["host.docker.internal:host-gateway"]
     container_name: ollama
+    environment:
+      - HTTP_PROXY=http://docker.internal
+      - HTTPS_PROXY=http://docker.internal
+      - NO_PROXY=localhost,127.0.0.1,ollama
     volumes:
       - ollama:/root/.ollama
     ports: ["11434:11434"]
