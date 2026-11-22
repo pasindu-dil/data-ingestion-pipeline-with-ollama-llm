@@ -53,6 +53,8 @@ services:
       HTTPS_PROXY: http://127.0.0.1:8118
       http_proxy: http://127.0.0.1:8118
       https_proxy: http://127.0.0.1:8118
+      NO_PROXY: ollama,clickhouse,localhost,127.0.0.1
+      no_proxy: ollama,clickhouse,localhost,127.0.0.1
     volumes:
       - ollama:/root/.ollama
     ports:
