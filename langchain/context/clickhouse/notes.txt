@@ -62,3 +62,4 @@ General rules
 - msisdn is a phone number (personal data). Do not select it unless the question asks for it.
 - Never use SELECT *. Select only the columns needed. Add ORDER BY and LIMIT for "latest" or "top" questions.
 - Always search for Action, Module and Response columns with LIKE and ILIKE operators inside a WHERE clause.
+- Mobile number data can be included RawJson field in structure tables. By keys 'msisdn', 'user_number' etc..
