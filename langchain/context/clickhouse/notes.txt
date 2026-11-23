@@ -14,7 +14,6 @@ Tables
   (materialized views that fill the structured_* tables).
 - Prefer structured_event_logs and structured_request_logs when the question can be answered from
   their columns. Use event_logs / request_logs only when the structured tables lack the data.
-- Always search for action with LIKE and ILIKE operators inside a WHERE clause.
 
 Request log details
 - The log level looks like local.INFO or local.ERROR (environment.LEVEL). To find errors use
@@ -62,3 +61,4 @@ General rules
 - Timestamps are written like 2025-12-08 09:58:24.
 - msisdn is a phone number (personal data). Do not select it unless the question asks for it.
 - Never use SELECT *. Select only the columns needed. Add ORDER BY and LIMIT for "latest" or "top" questions.
+- Always search for action, module columns with LIKE and ILIKE operators inside a WHERE clause.
