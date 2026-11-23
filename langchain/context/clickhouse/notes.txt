@@ -14,6 +14,7 @@ Tables
   (materialized views that fill the structured_* tables).
 - Prefer structured_event_logs and structured_request_logs when the question can be answered from
   their columns. Use event_logs / request_logs only when the structured tables lack the data.
+- Always search for action with LIKE and ILIKE operators inside a WHERE clause.
 
 Request log details
 - The log level looks like local.INFO or local.ERROR (environment.LEVEL). To find errors use
