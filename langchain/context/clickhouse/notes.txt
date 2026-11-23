@@ -1,7 +1,7 @@
 # Hints for the ClickHouse SQL generator. REPLACE the text below with facts about YOUR tables.
 # Everything in this file is sent to the LLM on every question, so keep it short and factual.
 
-Database: otel (always use fully qualified names, e.g. otel.request_logs).
+Database: bsmsc_logs (always use fully qualified names, e.g. bsmsc_logs.request_logs).
 
 Tables
 - event_logs, structured_event_logs: event logs. Each row is one consent request record.
@@ -9,7 +9,7 @@ Tables
   param_ids, request_status, status_code, consent_status, user_input.
 - request_logs, structured_request_logs: HTTP request logs written by a Laravel web application.
   Each row is one request with: time, log level, HTTP method, URL and a JSON payload.
-- otel_logs: logs collected by the OpenTelemetry collector.
+- event_logs,request_logs: logs collected by the OpenTelemetry collector.
 - Do NOT query event_logs_bkp (backup copy), mv_structured_event_logs or mv_structured_request_logs
   (materialized views that fill the structured_* tables).
 - Prefer structured_event_logs and structured_request_logs when the question can be answered from
@@ -34,7 +34,7 @@ Request log details
 - Typical endpoints: /transactions/datatable, /campaign-history/datatable.
 
 Event log meanings
-- The main log table is otel.event_logs. One row = one log line.
+- The main log table is event_logs. One row = one log line.
 - Column `Timestamp` is DateTime64 in UTC. Use it for every time filter.
 - Column `LogLevel` holds: DEBUG, INFO, WARN, ERROR. An "error" always means level = 'ERROR'.
 - Column `service` is the application name (e.g. 'sms-firewall', 'ussd-gateway').
