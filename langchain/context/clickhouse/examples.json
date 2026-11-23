@@ -72,8 +72,8 @@
     "sql": "SELECT Module, count() AS events_with_number FROM structured_event_logs WHERE RawJson LIKE '%\"user_number\"%' GROUP BY Module ORDER BY events_with_number DESC"
   },
   {
-    "question": "Show events where the action is related to export",
-    "sql": "SELECT Timestamp, Module, Action, Event, Status FROM structured_event_logs WHERE Action ILIKE '%export%' ORDER BY Timestamp DESC LIMIT 50"
+    "question": "Show events where the module is related to export",
+    "sql": "SELECT Timestamp, Module, Action, Event, Status FROM structured_event_logs WHERE Module ILIKE '%download%' ORDER BY Timestamp DESC LIMIT 50"
   },
   {
     "question": "Find events whose response mentions timeout",
@@ -81,10 +81,10 @@
   },
   {
     "question": "How many failures per action in the report module in the last 7 days?",
-    "sql": "SELECT Action, count() AS failures FROM structured_event_logs WHERE Module ILIKE '%report%' AND Status != 'success' AND Timestamp >= now() - INTERVAL 7 DAY GROUP BY Action ORDER BY failures DESC"
+    "sql": "SELECT Action, count() AS failures FROM structured_event_logs WHERE Action ILIKE '%report%' AND Timestamp >= now() - INTERVAL 7 DAY GROUP BY Action ORDER BY failures DESC"
   },
   {
     "question": "Show failed events where the response contains invalid or not found",
-    "sql": "SELECT Timestamp, Module, Action, substring(Response, 1, 200) AS response FROM structured_event_logs WHERE Status != 'success' AND (Response ILIKE '%invalid%' OR Response ILIKE '%not found%') ORDER BY Timestamp DESC LIMIT 50"
+    "sql": "SELECT Timestamp, Module, Action, substring(Response, 1, 200) AS response FROM structured_event_logs WHERE (Response ILIKE '%invalid%' OR Response ILIKE '%not found%') ORDER BY Timestamp DESC LIMIT 50"
   }
 ]
