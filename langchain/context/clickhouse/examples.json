@@ -1,90 +1,90 @@
 [
   {
     "question": "Show the number of requests per hour for the last 24 hours",
-    "sql": "SELECT toStartOfHour(Timestamp) AS hour, count() AS requests\nFROM otel.structured_request_logs\nWHERE Timestamp > now() - INTERVAL 24 HOUR\nGROUP BY hour\nORDER BY hour"
+    "sql": "SELECT toStartOfHour(Timestamp) AS hour, count() AS requests\nFROM structured_request_logs\nWHERE Timestamp > now() - INTERVAL 24 HOUR\nGROUP BY hour\nORDER BY hour"
   },
   {
     "question": "Which endpoints were called most today?",
-    "sql": "SELECT path(Url) AS endpoint, count() AS requests\nFROM otel.structured_request_logs\nWHERE toDate(Timestamp) = today()\nGROUP BY endpoint\nORDER BY requests DESC\nLIMIT 10"
+    "sql": "SELECT path(Url) AS endpoint, count() AS requests\nFROM structured_request_logs\nWHERE toDate(Timestamp) = today()\nGROUP BY endpoint\nORDER BY requests DESC\nLIMIT 10"
   },
   {
     "question": "Show request count per HTTP method for the last 7 days",
-    "sql": "SELECT Method, count() AS requests\nFROM otel.structured_request_logs\nWHERE Timestamp > now() - INTERVAL 7 DAY\nGROUP BY Method\nORDER BY requests DESC"
+    "sql": "SELECT Method, count() AS requests\nFROM structured_request_logs\nWHERE Timestamp > now() - INTERVAL 7 DAY\nGROUP BY Method\nORDER BY requests DESC"
   },
   {
     "question": "Show the number of requests per day for the last 7 days",
-    "sql": "SELECT toDate(Timestamp) AS day, count() AS requests\nFROM otel.structured_request_logs\nWHERE Timestamp > now() - INTERVAL 7 DAY\nGROUP BY day\nORDER BY day"
+    "sql": "SELECT toDate(Timestamp) AS day, count() AS requests\nFROM structured_request_logs\nWHERE Timestamp > now() - INTERVAL 7 DAY\nGROUP BY day\nORDER BY day"
   },
   {
     "question": "Which users made the most requests today?",
-    "sql": "SELECT AuthUserId AS user_id, count() AS requests\nFROM otel.structured_request_logs\nWHERE toDate(Timestamp) = today() AND AuthUserId > 0\nGROUP BY user_id\nORDER BY requests DESC\nLIMIT 10"
+    "sql": "SELECT AuthUserId AS user_id, count() AS requests\nFROM structured_request_logs\nWHERE toDate(Timestamp) = today() AND AuthUserId > 0\nGROUP BY user_id\nORDER BY requests DESC\nLIMIT 10"
   },
   {
     "question": "Show the 20 most recent requests to the campaign-history datatable",
-    "sql": "SELECT Timestamp, Method, Url, TraceId AS request_id, AuthUserId, CorporationId\nFROM otel.structured_request_logs\nWHERE path(Url) = '/campaign-history/datatable'\nORDER BY Timestamp DESC\nLIMIT 20"
+    "sql": "SELECT Timestamp, Method, Url, TraceId AS request_id, AuthUserId, CorporationId\nFROM structured_request_logs\nWHERE path(Url) = '/campaign-history/datatable'\nORDER BY Timestamp DESC\nLIMIT 20"
   },
   {
     "question": "Show request count per client IP in the last 24 hours",
-    "sql": "SELECT ClientIP, count() AS requests\nFROM otel.structured_request_logs\nWHERE Timestamp > now() - INTERVAL 24 HOUR AND ClientIP != ''\nGROUP BY ClientIP\nORDER BY requests DESC\nLIMIT 10"
+    "sql": "SELECT ClientIP, count() AS requests\nFROM structured_request_logs\nWHERE Timestamp > now() - INTERVAL 24 HOUR AND ClientIP != ''\nGROUP BY ClientIP\nORDER BY requests DESC\nLIMIT 10"
   },
   {
     "question": "Find the request with request id 6acef65fbcff0",
-    "sql": "SELECT Timestamp, LogLevel, Method, Url, ClientIP, AuthUserId, RawJson\nFROM otel.structured_request_logs\nWHERE TraceId = '6acef65fbcff0'\nLIMIT 1"
+    "sql": "SELECT Timestamp, LogLevel, Method, Url, ClientIP, AuthUserId, RawJson\nFROM structured_request_logs\nWHERE TraceId = '6acef65fbcff0'\nLIMIT 1"
   },
   {
     "question": "How many error level requests were logged per hour in the last 24 hours?",
-    "sql": "SELECT toStartOfHour(Timestamp) AS hour, count() AS errors\nFROM otel.structured_request_logs\nWHERE LogLevel LIKE '%ERROR' AND Timestamp > now() - INTERVAL 24 HOUR\nGROUP BY hour\nORDER BY hour"
+    "sql": "SELECT toStartOfHour(Timestamp) AS hour, count() AS errors\nFROM structured_request_logs\nWHERE LogLevel LIKE '%ERROR' AND Timestamp > now() - INTERVAL 24 HOUR\nGROUP BY hour\nORDER BY hour"
   },
   {
     "question": "Show the 20 most recent application error events",
-    "sql": "SELECT Timestamp, TraceId, Module, Action, Event, Status, UserEmail, Response\nFROM otel.structured_event_logs\nWHERE LogLevel = 'local.ERROR' OR Status = 'failed'\nORDER BY Timestamp DESC\nLIMIT 20"
+    "sql": "SELECT Timestamp, TraceId, Module, Action, Event, Status, UserEmail, Response\nFROM structured_event_logs\nWHERE LogLevel = 'local.ERROR' OR Status = 'failed'\nORDER BY Timestamp DESC\nLIMIT 20"
   },
   {
     "question": "How many event logs occurred per module today?",
-    "sql": "SELECT Module, count() AS total_events, countIf(LogLevel = 'local.ERROR' OR Status = 'failed') AS error_events\nFROM otel.structured_event_logs\nWHERE toDate(Timestamp) = today()\nGROUP BY Module\nORDER BY total_events DESC"
+    "sql": "SELECT Module, count() AS total_events, countIf(LogLevel = 'local.ERROR' OR Status = 'failed') AS error_events\nFROM structured_event_logs\nWHERE toDate(Timestamp) = today()\nGROUP BY Module\nORDER BY total_events DESC"
   },
   {
     "question": "Show all login events and password warnings for super@mylinex.com",
-    "sql": "SELECT Timestamp, TraceId, LogLevel, Event, Status, Response\nFROM otel.structured_event_logs\nWHERE Module = 'login' AND UserEmail = 'super@mylinex.com'\nORDER BY Timestamp DESC\nLIMIT 20"
+    "sql": "SELECT Timestamp, TraceId, LogLevel, Event, Status, Response\nFROM structured_event_logs\nWHERE Module = 'login' AND UserEmail = 'super@mylinex.com'\nORDER BY Timestamp DESC\nLIMIT 20"
   },
   {
     "question": "Which users triggered the most application events today?",
-    "sql": "SELECT UserId, UserName, UserEmail, count() AS event_count\nFROM otel.structured_event_logs\nWHERE toDate(Timestamp) = today() AND (UserId > 0 OR UserEmail != '')\nGROUP BY UserId, UserName, UserEmail\nORDER BY event_count DESC\nLIMIT 10"
+    "sql": "SELECT UserId, UserName, UserEmail, count() AS event_count\nFROM structured_event_logs\nWHERE toDate(Timestamp) = today() AND (UserId > 0 OR UserEmail != '')\nGROUP BY UserId, UserName, UserEmail\nORDER BY event_count DESC\nLIMIT 10"
   },
   {
     "question": "Trace everything that happened for request or trace id 6afd11205d6ca across requests and events",
-    "sql": "SELECT r.Timestamp AS request_time, r.Method, r.Url, r.ClientIP, e.Timestamp AS event_time, e.Module, e.Action, e.Event, e.LogLevel, e.Status, e.Response\nFROM otel.structured_event_logs AS e\nLEFT JOIN otel.structured_request_logs AS r ON e.TraceId = r.TraceId\nWHERE e.TraceId = '6afd11205d6ca'\nORDER BY e.Timestamp ASC"
+    "sql": "SELECT r.Timestamp AS request_time, r.Method, r.Url, r.ClientIP, e.Timestamp AS event_time, e.Module, e.Action, e.Event, e.LogLevel, e.Status, e.Response\nFROM structured_event_logs AS e\nLEFT JOIN structured_request_logs AS r ON e.TraceId = r.TraceId\nWHERE e.TraceId = '6afd11205d6ca'\nORDER BY e.Timestamp ASC"
   },
   {
     "question": "Which API endpoints caused the most application errors in the last 24 hours?",
-    "sql": "SELECT path(r.Url) AS endpoint, e.Module, count() AS error_count\nFROM otel.structured_event_logs AS e\nINNER JOIN otel.structured_request_logs AS r ON e.TraceId = r.TraceId\nWHERE (e.LogLevel = 'local.ERROR' OR e.Status = 'failed') AND e.Timestamp > now() - INTERVAL 24 HOUR\nGROUP BY endpoint, e.Module\nORDER BY error_count DESC\nLIMIT 10"
+    "sql": "SELECT path(r.Url) AS endpoint, e.Module, count() AS error_count\nFROM structured_event_logs AS e\nINNER JOIN structured_request_logs AS r ON e.TraceId = r.TraceId\nWHERE (e.LogLevel = 'local.ERROR' OR e.Status = 'failed') AND e.Timestamp > now() - INTERVAL 24 HOUR\nGROUP BY endpoint, e.Module\nORDER BY error_count DESC\nLIMIT 10"
   },
   {
     "question": "List the report files that were reported as ready, newest first",
-    "sql": "SELECT Timestamp, Module, Action, extract(RawJson, '\\'([^\\']+\\\\.zip)\\'') AS report_file FROM otel.structured_event_logs WHERE positionCaseInsensitive(RawJson, 'is ready') > 0 ORDER BY Timestamp DESC LIMIT 50"
+    "sql": "SELECT Timestamp, Module, Action, extract(RawJson, '\\'([^\\']+\\\\.zip)\\'') AS report_file FROM structured_event_logs WHERE positionCaseInsensitive(RawJson, 'is ready') > 0 ORDER BY Timestamp DESC LIMIT 50"
   },
   {
     "question": "Show the notification messages sent to users with the mobile number masked",
-    "sql": "SELECT Timestamp, Module, Action, extract(RawJson, '\"user_msg\":\"([^\"]*)\"') AS user_msg, replaceRegexpOne(extract(RawJson, '\"user_number\":\"([^\"]*)\"'), '^.*(.{3})$', '*******\\\\1') AS masked_number FROM otel.structured_event_logs WHERE RawJson LIKE '%\"user_number\"%' ORDER BY Timestamp DESC LIMIT 50"
+    "sql": "SELECT Timestamp, Module, Action, extract(RawJson, '\"user_msg\":\"([^\"]*)\"') AS user_msg, replaceRegexpOne(extract(RawJson, '\"user_number\":\"([^\"]*)\"'), '^.*(.{3})$', '*******\\\\1') AS masked_number FROM structured_event_logs WHERE RawJson LIKE '%\"user_number\"%' ORDER BY Timestamp DESC LIMIT 50"
   },
   {
     "question": "How many events per module contain a mobile number?",
-    "sql": "SELECT Module, count() AS events_with_number FROM otel.structured_event_logs WHERE RawJson LIKE '%\"user_number\"%' GROUP BY Module ORDER BY events_with_number DESC"
+    "sql": "SELECT Module, count() AS events_with_number FROM structured_event_logs WHERE RawJson LIKE '%\"user_number\"%' GROUP BY Module ORDER BY events_with_number DESC"
   },
   {
     "question": "Show events where the action is related to export",
-    "sql": "SELECT Timestamp, Module, Action, Event, Status FROM otel.structured_event_logs WHERE Action ILIKE '%export%' ORDER BY Timestamp DESC LIMIT 50"
+    "sql": "SELECT Timestamp, Module, Action, Event, Status FROM structured_event_logs WHERE Action ILIKE '%export%' ORDER BY Timestamp DESC LIMIT 50"
   },
   {
     "question": "Find events whose response mentions timeout",
-    "sql": "SELECT Timestamp, Module, Action, Status, substring(Response, 1, 200) AS response FROM otel.structured_event_logs WHERE Response ILIKE '%timeout%' ORDER BY Timestamp DESC LIMIT 50"
+    "sql": "SELECT Timestamp, Module, Action, Status, substring(Response, 1, 200) AS response FROM structured_event_logs WHERE Response ILIKE '%timeout%' ORDER BY Timestamp DESC LIMIT 50"
   },
   {
     "question": "How many failures per action in the report module in the last 7 days?",
-    "sql": "SELECT Action, count() AS failures FROM otel.structured_event_logs WHERE Module ILIKE '%report%' AND Status != 'success' AND Timestamp >= now() - INTERVAL 7 DAY GROUP BY Action ORDER BY failures DESC"
+    "sql": "SELECT Action, count() AS failures FROM structured_event_logs WHERE Module ILIKE '%report%' AND Status != 'success' AND Timestamp >= now() - INTERVAL 7 DAY GROUP BY Action ORDER BY failures DESC"
   },
   {
     "question": "Show failed events where the response contains invalid or not found",
-    "sql": "SELECT Timestamp, Module, Action, substring(Response, 1, 200) AS response FROM otel.structured_event_logs WHERE Status != 'success' AND (Response ILIKE '%invalid%' OR Response ILIKE '%not found%') ORDER BY Timestamp DESC LIMIT 50"
+    "sql": "SELECT Timestamp, Module, Action, substring(Response, 1, 200) AS response FROM structured_event_logs WHERE Status != 'success' AND (Response ILIKE '%invalid%' OR Response ILIKE '%not found%') ORDER BY Timestamp DESC LIMIT 50"
   }
 ]
