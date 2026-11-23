@@ -61,5 +61,13 @@ General rules
 - Timestamps are written like 2025-12-08 09:58:24.
 - msisdn is a phone number (personal data). Do not select it unless the question asks for it.
 - Never use SELECT *. Select only the columns needed. Add ORDER BY and LIMIT for "latest" or "top" questions.
-- Always search for Action, Module and Response columns with LIKE and ILIKE operators inside a WHERE clause.
-- Mobile number data can be included RawJson field in structure event logs tables. By keys 'msisdn', 'user_number' etc..
+- RawJson is a JSON string that can contain a mobile number in "user_number". NEVER return RawJson itself and NEVER return a full mobile number. When a number is needed, show it masked (only the last 3 digits).
+- RawJson contains "user_msg" (the message text) and "user_number". Read them with extract(RawJson, '"user_msg":"([^"]*)"') because the JSON nesting is not fixed.
+- Report file names (for example campaign_summary_failures_134921855_6abf9b98d6212.zip) appear inside the user_msg text in single quotes.
+- FilePath is the source log file, for example /logs/events/log-2026-10-02.log.
+- Show the newest rows first (ORDER BY Timestamp DESC) unless the question asks otherwise.
+- Filtering on the Module, Action and Response columns: ALWAYS use ILIKE '%term%'
+  (case-insensitive) inside the WHERE clause, never =, != or IN. Use LIKE only when the
+  question explicitly asks for a case-sensitive match. For several terms combine them
+  with OR inside parentheses. This rule is for filters only (GROUP BY and SELECT are
+  unchanged). Other columns (Status, TraceId, UserEmail, FilePath) use exact =.

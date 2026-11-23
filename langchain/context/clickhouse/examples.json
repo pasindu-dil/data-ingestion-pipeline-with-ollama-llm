@@ -58,5 +58,33 @@
   {
     "question": "Which API endpoints caused the most application errors in the last 24 hours?",
     "sql": "SELECT path(r.Url) AS endpoint, e.Module, count() AS error_count\nFROM otel.structured_event_logs AS e\nINNER JOIN otel.structured_request_logs AS r ON e.TraceId = r.TraceId\nWHERE (e.LogLevel = 'local.ERROR' OR e.Status = 'failed') AND e.Timestamp > now() - INTERVAL 24 HOUR\nGROUP BY endpoint, e.Module\nORDER BY error_count DESC\nLIMIT 10"
+  },
+  {
+    "question": "List the report files that were reported as ready, newest first",
+    "sql": "SELECT Timestamp, Module, Action, extract(RawJson, '\\'([^\\']+\\\\.zip)\\'') AS report_file FROM otel.structured_event_logs WHERE positionCaseInsensitive(RawJson, 'is ready') > 0 ORDER BY Timestamp DESC LIMIT 50"
+  },
+  {
+    "question": "Show the notification messages sent to users with the mobile number masked",
+    "sql": "SELECT Timestamp, Module, Action, extract(RawJson, '\"user_msg\":\"([^\"]*)\"') AS user_msg, replaceRegexpOne(extract(RawJson, '\"user_number\":\"([^\"]*)\"'), '^.*(.{3})$', '*******\\\\1') AS masked_number FROM otel.structured_event_logs WHERE RawJson LIKE '%\"user_number\"%' ORDER BY Timestamp DESC LIMIT 50"
+  },
+  {
+    "question": "How many events per module contain a mobile number?",
+    "sql": "SELECT Module, count() AS events_with_number FROM otel.structured_event_logs WHERE RawJson LIKE '%\"user_number\"%' GROUP BY Module ORDER BY events_with_number DESC"
+  },
+  {
+    "question": "Show events where the action is related to export",
+    "sql": "SELECT Timestamp, Module, Action, Event, Status FROM otel.structured_event_logs WHERE Action ILIKE '%export%' ORDER BY Timestamp DESC LIMIT 50"
+  },
+  {
+    "question": "Find events whose response mentions timeout",
+    "sql": "SELECT Timestamp, Module, Action, Status, substring(Response, 1, 200) AS response FROM otel.structured_event_logs WHERE Response ILIKE '%timeout%' ORDER BY Timestamp DESC LIMIT 50"
+  },
+  {
+    "question": "How many failures per action in the report module in the last 7 days?",
+    "sql": "SELECT Action, count() AS failures FROM otel.structured_event_logs WHERE Module ILIKE '%report%' AND Status != 'success' AND Timestamp >= now() - INTERVAL 7 DAY GROUP BY Action ORDER BY failures DESC"
+  },
+  {
+    "question": "Show failed events where the response contains invalid or not found",
+    "sql": "SELECT Timestamp, Module, Action, substring(Response, 1, 200) AS response FROM otel.structured_event_logs WHERE Status != 'success' AND (Response ILIKE '%invalid%' OR Response ILIKE '%not found%') ORDER BY Timestamp DESC LIMIT 50"
   }
 ]
